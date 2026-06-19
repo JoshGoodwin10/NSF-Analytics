@@ -9,38 +9,51 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f7fa; color:#333; line-height:1.6; }
   .container { max-width:1200px; margin:0 auto; padding:20px; }
-  header { background:linear-gradient(135deg,#5B9BD5 0%,#2E75B6 100%); color:white; padding:40px 20px;
+  header { background:linear-gradient(135deg,#67c7f1 0%,#4bbaea 100%); color:white; padding:40px 20px;
            text-align:center; border-radius:10px; margin-bottom:30px; }
   header h1 { font-size:2.4em; margin-bottom:8px; }
   header p  { font-size:1.1em; opacity:.9; }
   .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-bottom:30px; }
   .stat-card { background:white; padding:22px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,.1);
-               border-left:4px solid #5B9BD5; }
-  .stat-card h3 { color:#2E75B6; font-size:.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+               border-left:4px solid #67c7f1; }
+  .stat-card h3 { color:#67c7f1; font-size:.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
   .stat-card .value { font-size:1.9em; font-weight:bold; }
   .section { background:white; padding:28px; border-radius:10px; margin-bottom:28px;
              box-shadow:0 2px 4px rgba(0,0,0,.1); }
-  .section h2 { color:#2E75B6; font-size:1.4em; margin-bottom:18px; padding-bottom:8px;
+  .section h2 { color:#67c7f1; font-size:1.4em; margin-bottom:18px; padding-bottom:8px;
                 border-bottom:2px solid #f0f0f0; }
   table { width:100%; border-collapse:collapse; margin-top:14px; }
   th,td { padding:10px 12px; text-align:left; border-bottom:1px solid #eee; }
-  th { background:#f8f9fa; font-weight:600; color:#2E75B6; }
+  th { background:#f8f9fa; font-weight:600; color:#4bbaea; }
   tr:hover { background:#f8f9fa; }
   .chart-container { text-align:center; margin:18px 0; }
   .chart-container img { max-width:100%; height:auto; border-radius:8px;
                           box-shadow:0 2px 8px rgba(0,0,0,.1); }
   .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   @media (max-width:768px) { .two-col { grid-template-columns:1fr; } }
+  .story-block { display:grid; grid-template-columns:2fr 1fr; gap:30px; align-items:stretch; }
+  @media (max-width:768px) { .story-block { grid-template-columns:1fr; } }
+  .story-text h3 { color:#67c7f1; font-size:1.15em; margin-bottom:12px; }
+  .story-text p { margin-bottom:12px; text-align:justify; }
+  .story-text ul { margin-left:20px; margin-bottom:12px; }
+  .story-text li { margin-bottom:6px; }
+  .story-images { display:flex; flex-direction:column; height:100%; }
+  .img-stack { display:flex; flex-direction:column; gap:8px; width:100%; height:100%; }
+  .img-stack img { width:100%; flex:1 1 0; min-height:0; object-fit:cover; border-radius:8px; }
   footer { text-align:center; padding:20px; color:#999; font-size:.85em; }
   .none-msg { color:#888; font-style:italic; padding:20px; }
 </style>
 </head>
 <body>
 <div class="container">
-  <header>
+  <header style="position:relative; padding:40px 20px; text-align:center;">
+    <div style="position:absolute; left:0; top:0; bottom:0; background:#ffe100; display:flex; align-items:center; justify-content:center; padding:0 20px; border-radius:10px 0 0 10px;">
+      <img src="LeadHR Logo.png" alt="Lead HR Logo"
+        style="height:110px; width:auto; display:block; object-fit:contain;">
+    </div>
     <h1>NSF Analytics Report</h1>
     <p>Combined Learner Data and Dropouts Analysis</p>
-    <p style="margin-top:8px;font-size:.88em;">Generated: 2026-06-19 08:32:14</p>
+    <p style="margin-top:8px;font-size:.88em;">Generated: 2026-06-19 13:29:32</p>
   </header>
 
   <!-- Key Metrics -->
@@ -48,14 +61,53 @@
     <div class="stat-card"><h3>Total Learners</h3><div class="value">607</div></div>
     <div class="stat-card"><h3>Total Dropouts</h3><div class="value">123</div></div>
     
-    <div class="stat-card"><h3>With Departure Info</h3><div class="value">24</div></div>
-    
-    
     <div class="stat-card"><h3>Dropouts (Last 12 Mo)</h3><div class="value">54</div></div>
     
     
     
     
+  </div>
+
+  <!-- Success Stories -->
+  <div class="section">
+    <h2>Success Stories</h2>
+
+    <div class="story-block">
+      <div class="story-text">
+        <h3>Youth Empowerment Conference</h3>
+        <p>The Wentworth Youth Centre buzzed with energy as it hosted the impactful Youth Empowerment Conference. This vital initiative was born from the passionate vision of Nonelwa, one of our dedicated interns, whose desire to effect positive change in Ward 66 truly inspired us. Working hand-in-hand with Councillor Zoe and a committed team of individuals, Nonelwa's dream transformed into a tangible reality, ensuring the conference was a resounding success. Over two dynamic days, the conference provided a crucial platform for the unemployed youth of Ward 66. Various organizations stepped forward, offering invaluable guidance on a multitude of pathways to self-improvement and opportunity.</p>
+        <p>Attendees gained insights into:</p>
+        <ul>
+          <li><b>Acquiring Employment:</b> Practical advice and strategies for job searching.</li>
+          <li><b>Internships &amp; Learnerships:</b> Information on gaining vital work experience.</li>
+          <li><b>Education &amp; Skills Development:</b> Opportunities for further learning and acquiring new, in-demand skills.</li>
+        </ul>
+        <p>The overwhelming participation and positive feedback from the youth underscored the critical need for such initiatives. It was a powerful demonstration of community collaboration, igniting hope and providing concrete steps for a brighter future for the young people of Ward 66. We're incredibly proud of Nonelwa's leadership and the collective effort that made this event possible!</p>
+      </div>
+      <div class="story-images">
+        <div class="img-stack">
+          <img src="Youth Empowerment Conference 1.png" alt="Youth Empowerment Conference 1">
+          <img src="Youth Empowerment Conference 2.png" alt="Youth Empowerment Conference 2">
+          <img src="Youth Empowerment Conference 3.png" alt="Youth Empowerment Conference 3">
+          <img src="Youth Empowerment Conference 4.png" alt="Youth Empowerment Conference 4">
+        </div>
+      </div>
+    </div>
+
+    <div class="story-block" style="margin-top:40px;">
+      <div class="story-text">
+        <h3>Spotlight on Zanele Mhlongo</h3>
+        <p>We're incredibly proud to shine a spotlight on Zanele Mhlongo, an outstanding intern from our NSF WIL placement programme. Zanele has consistently developed and added immense value to those around her. Her insightful articles, which have graced the pages of various newspapers, stand as a true testament to her exceptional skill and dedication. She has fully integrated into her environment, pushing the boundaries of what it means to be an 'intern'.</p>
+        <p style="font-style:italic; border-left:3px solid #67c7f1; padding-left:15px; margin:15px 0; color:#555;">"I feel like I'm not expressing my gratitude fully. I would like to take this opportunity to thank you for the chance you have given me. I'm absolutely loving the experience I'm gaining here. One of the highlights is seeing my work featured in prominent publications like Metro Ezasegagasini, Newsflashes and Workplace magazine. These contributions are a testament to the skills I'm developing and the value I'm adding. KEEP UP THE GOOD WORK"</p>
+        <p><b>Zanele.</b></p>
+      </div>
+      <div class="story-images">
+        <div class="img-stack">
+          <img src="Zanele 1.png" alt="Zanele 1">
+          <img src="Zanele 2.png" alt="Zanele 2">
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Host Employers -->
@@ -287,7 +339,7 @@ Statistics)</td><td>1</td></tr><tr><td>86</td><td>Graduates: Internships (Social
     <div class="chart-container"><img src="charts/disability_types.png" alt="Disabilities"></div>
     <table>
       <tr><th>Disability Type</th><th>Affected Learners</th></tr>
-      <tr><td>Blind</td><td>7</span></td></tr><tr><td>Partially Sighted</td><td>2</span></td></tr><tr><td>Deaf</td><td>2</span></td></tr><tr><td>Neurodevelopmental</td><td>1</span></td></tr><tr><td>Psychosocial Disability</td><td>1</span></td></tr><tr><td>Physical Disability</td><td>2</span></td></tr>
+      <tr><td>Blind</td><td>7</td></tr><tr><td>Partially Sighted</td><td>2</td></tr><tr><td>Deaf</td><td>2</td></tr><tr><td>Neurodevelopmental</td><td>1</td></tr><tr><td>Psychosocial Disability</td><td>1</td></tr><tr><td>Physical Disability</td><td>2</td></tr>
     </table>
     
   </div>
@@ -370,7 +422,7 @@ Statistics)</td><td>1</td></tr><tr><td>86</td><td>Graduates: Internships (Social
     </div>
   </div>
 
-  <footer>NSF Analytics System | Generated on 2026-06-19 08:32:14</footer>
+  <footer>Lead HR Consulting | NSF Analytics | Generated on 2026-06-19 13:29:32</footer>
 </div>
 </body>
 </html>

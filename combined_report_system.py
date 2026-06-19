@@ -1,6 +1,6 @@
 """
 Requirements:
-    pip install pandas openpyxl matplotlib seaborn jinja2 weasyprint tkinterdnd2
+    pip install pandas openpyxl matplotlib seaborn jinja2 tkinterdnd2 Pillow
 """
 
 import sys
@@ -85,7 +85,6 @@ def build_pdf(pdf_path: Path, title: str, stats: dict, charts_dir: Path) -> bool
             widths = ([1*cm, 7*cm, 7*cm, 2*cm] if pct
                       else [1*cm, 10*cm, 5.5*cm])
             tbl = Table(data, colWidths=widths[:len(header)+1] if not pct else widths)
-            # simpler: just use auto widths
             tbl = Table(data)
             tbl.setStyle(TableStyle([
                 ("BACKGROUND", (0,0), (-1,0), BLUE),
@@ -132,9 +131,7 @@ def build_pdf(pdf_path: Path, title: str, stats: dict, charts_dir: Path) -> bool
             story.append(kv_table(kv_rows))
             story.append(Spacer(1, 0.5*cm))
 
-        # Iterate over all possible sections
         sections = [
-            # (stat_key,                    chart_name,                  section_title,                      col1,       pct)
             ("learners_per_site",         None,                        "Host Employers",                   "Site",     False),
             ("top_programmes_wil",        "top_programmes_wil",        "Top WIL Learning Programmes",      "Programme",True),
             ("top_programmes_graduates",  "top_programmes_graduates",  "Top Graduate Learning Programmes", "Programme",True),
@@ -161,7 +158,6 @@ def build_pdf(pdf_path: Path, title: str, stats: dict, charts_dir: Path) -> bool
             story.append(ranked_table(stats[stat_key], col1=col1, col2="Count", pct=pct))
             story.append(Spacer(1, 0.4*cm))
 
-        # Timeline chart (no table)
         if stats.get("dropouts_by_year_month"):
             story.append(Paragraph("Dropouts Over Time", h2_style))
             img = insert_chart("dropouts_timeline")
@@ -169,7 +165,6 @@ def build_pdf(pdf_path: Path, title: str, stats: dict, charts_dir: Path) -> bool
                 story.append(img)
             story.append(Spacer(1, 0.4*cm))
 
-        # Disability
         if stats.get("disability"):
             active = {k: v for k, v in stats["disability"].items() if v > 0}
             if active:
@@ -182,7 +177,6 @@ def build_pdf(pdf_path: Path, title: str, stats: dict, charts_dir: Path) -> bool
                     col1="Type", pct=False))
                 story.append(Spacer(1, 0.4*cm))
 
-        # Metro / Rural
         if stats.get("metro_rural_crosstab"):
             story.append(Paragraph("Metro and Rural Classification", h2_style))
             img = insert_chart("metro_rural")
@@ -190,7 +184,6 @@ def build_pdf(pdf_path: Path, title: str, stats: dict, charts_dir: Path) -> bool
                 story.append(img)
             story.append(Spacer(1, 0.4*cm))
 
-        # Age / duration charts
         for chart, label in [("age_distribution","Age Distribution"),
                               ("duration_distribution","Programme Duration Distribution")]:
             img = insert_chart(chart)
@@ -199,7 +192,6 @@ def build_pdf(pdf_path: Path, title: str, stats: dict, charts_dir: Path) -> bool
                 story.append(img)
                 story.append(Spacer(1, 0.4*cm))
 
-        # High demand
         hd = {}
         if "high_demand_2020" in stats: hd["2020 List"] = stats["high_demand_2020"]
         if "high_demand_2024" in stats: hd["2024 List"] = stats["high_demand_2024"]
@@ -221,6 +213,7 @@ def build_pdf(pdf_path: Path, title: str, stats: dict, charts_dir: Path) -> bool
     except Exception as e:
         print(f"\n  ⚠  PDF build failed: {e}")
         return False
+
 
 # Dropouts Report
 
@@ -349,7 +342,7 @@ class DropoutsReportSystem:
             data = pd.Series({'Has Departure Info': self.summary_stats['with_departure_info'],
                                'No Departure Info':  self.summary_stats['without_departure_info']})
             ax.pie(data.values, labels=data.index, autopct='%1.1f%%',
-                   colors=['#5B9BD5','#B4C7E7'], startangle=90)
+                   colors=['#67c7f1','#B4C7E7'], startangle=90)
             ax.set_title('Departure Information Coverage', fontsize=14, fontweight='bold')
             save_chart('departure_info_coverage', fig)
 
@@ -387,8 +380,8 @@ class DropoutsReportSystem:
             data = pd.to_numeric(pd.Series(self.summary_stats['dropouts_by_year_month']).sort_index(), errors='coerce').dropna()
             if data.sum() > 0:
                 fig, ax = plt.subplots(figsize=(14, 5))
-                ax.plot(range(len(data)), data.values, marker='o', color='#5B9BD5', linewidth=2, markersize=6)
-                ax.fill_between(range(len(data)), data.values, alpha=0.3, color='#5B9BD5')
+                ax.plot(range(len(data)), data.values, marker='o', color='#67c7f1', linewidth=2, markersize=6)
+                ax.fill_between(range(len(data)), data.values, alpha=0.3, color='#67c7f1')
                 ax.set_title('Dropouts Over Time (Year-Month)', fontsize=14, fontweight='bold')
                 step = max(1, len(data) // 12)
                 ax.set_xticks(range(0, len(data), step))
@@ -411,22 +404,22 @@ class DropoutsReportSystem:
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f7fa; color:#333; line-height:1.6; }
   .container { max-width:1100px; margin:0 auto; padding:20px; }
-  header { background:linear-gradient(135deg,#5B9BD5 0%,#2E75B6 100%); color:white; padding:40px 20px;
+  header { background:linear-gradient(135deg,#67c7f1 0%,#5bbcec 100%); color:white; padding:40px 20px;
            text-align:center; border-radius:10px; margin-bottom:30px; }
   header h1 { font-size:2.2em; margin-bottom:8px; }
   header p  { font-size:1.05em; opacity:.9; }
   .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-bottom:30px; }
   .stat-card { background:white; padding:22px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,.1);
-               border-left:4px solid #5B9BD5; }
-  .stat-card h3 { color:#2E75B6; font-size:.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+               border-left:4px solid #67c7f1; }
+  .stat-card h3 { color:#67c7f1; font-size:.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
   .stat-card .value { font-size:1.9em; font-weight:bold; }
   .section { background:white; padding:28px; border-radius:10px; margin-bottom:28px;
              box-shadow:0 2px 4px rgba(0,0,0,.1); }
-  .section h2 { color:#2E75B6; font-size:1.4em; margin-bottom:18px; padding-bottom:8px;
+  .section h2 { color:#67c7f1; font-size:1.4em; margin-bottom:18px; padding-bottom:8px;
                 border-bottom:2px solid #f0f0f0; }
   table { width:100%; border-collapse:collapse; margin-top:14px; }
   th,td { padding:10px 12px; text-align:left; border-bottom:1px solid #eee; }
-  th { background:#f8f9fa; font-weight:600; color:#2E75B6; }
+  th { background:#f8f9fa; font-weight:600; color:#67c7f1; }
   tr:hover { background:#f8f9fa; }
   .chart-container { text-align:center; margin:18px 0; }
   .chart-container img { max-width:100%; height:auto; border-radius:8px;
@@ -444,10 +437,6 @@ class DropoutsReportSystem:
 
   <div class="stats-grid">
     <div class="stat-card"><h3>Total Dropouts</h3><div class="value">{{ stats.total_dropouts }}</div></div>
-    {% if stats.with_departure_info is defined %}
-    <div class="stat-card"><h3>With Departure Info</h3><div class="value">{{ stats.with_departure_info }}</div></div>
-    <div class="stat-card"><h3>Without Departure Info</h3><div class="value">{{ stats.without_departure_info }}</div></div>
-    {% endif %}
     {% if stats.recent_dropouts_12mo is defined %}
     <div class="stat-card"><h3>Last 12 Months</h3><div class="value">{{ stats.recent_dropouts_12mo }}</div></div>
     {% endif %}
@@ -542,9 +531,7 @@ class DropoutsReportSystem:
         return {"html": html_path, "pdf": pdf_path if pdf_ok else None}
 
 
-# ─────────────────────────────────────────────
 # Learner Report
-# ─────────────────────────────────────────────
 
 class LearnerReportSystem:
     """Reporting system for DHET/SETA Learner Data analytics."""
@@ -638,7 +625,6 @@ class LearnerReportSystem:
             col = find_col(partial)
             if col: stats[key] = self.df[col].value_counts().to_dict()
 
-        # Top programmes - split into WIL and Graduates
         prog_col = find_col('Learning_Programme_Name')
         if prog_col:
             all_progs = self.df[prog_col].value_counts()
@@ -649,12 +635,10 @@ class LearnerReportSystem:
             if len(grad_progs) > 0:
                 stats['top_programmes_graduates'] = grad_progs.to_dict()
 
-        # Top sectors
         sector_col = find_col('ECONOMIC_SECTOR')
         if sector_col:
             stats['top_sectors'] = self.df[sector_col].value_counts().to_dict()
 
-        # Learners per site
         site_col = find_col('Learning_Site_Name')
         if site_col:
             stats['learners_per_site'] = self.df[site_col].value_counts().to_dict()
@@ -852,22 +836,22 @@ class LearnerReportSystem:
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f7fa; color:#333; line-height:1.6; }
   .container { max-width:1100px; margin:0 auto; padding:20px; }
-  header { background:linear-gradient(135deg,#5B9BD5 0%,#2E75B6 100%); color:white; padding:40px 20px;
+  header { background:linear-gradient(135deg,#67c7f1 0%,#2E75B6 100%); color:white; padding:40px 20px;
            text-align:center; border-radius:10px; margin-bottom:30px; }
   header h1 { font-size:2.2em; margin-bottom:8px; }
   header p  { font-size:1.05em; opacity:.9; }
   .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-bottom:30px; }
   .stat-card { background:white; padding:22px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,.1);
-               border-left:4px solid #5B9BD5; }
-  .stat-card h3 { color:#2E75B6; font-size:.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+               border-left:4px solid #67c7f1; }
+  .stat-card h3 { color:#67c7f1; font-size:.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
   .stat-card .value { font-size:1.9em; font-weight:bold; }
   .section { background:white; padding:28px; border-radius:10px; margin-bottom:28px;
              box-shadow:0 2px 4px rgba(0,0,0,.1); }
-  .section h2 { color:#2E75B6; font-size:1.4em; margin-bottom:18px; padding-bottom:8px;
+  .section h2 { color:#67c7f1; font-size:1.4em; margin-bottom:18px; padding-bottom:8px;
                 border-bottom:2px solid #f0f0f0; }
   table { width:100%; border-collapse:collapse; margin-top:14px; }
   th,td { padding:10px 12px; text-align:left; border-bottom:1px solid #eee; }
-  th { background:#f8f9fa; font-weight:600; color:#2E75B6; }
+  th { background:#f8f9fa; font-weight:600; color:#67c7f1; }
   tr:hover { background:#f8f9fa; }
   .chart-container { text-align:center; margin:18px 0; }
   .chart-container img { max-width:100%; height:auto; border-radius:8px;
@@ -1059,6 +1043,7 @@ class LearnerReportSystem:
         print("\n  ✔  Learner report complete!")
         return {"html": html_path, "pdf": pdf_path if pdf_ok else None}
 
+
 # Combined Report System
 
 class CombinedReportSystem:
@@ -1072,6 +1057,28 @@ class CombinedReportSystem:
         self.charts_dir = self.output_dir / "charts"
         self.charts_dir.mkdir(parents=True, exist_ok=True)
         self.combined_stats = {}
+
+    def _embed_images_as_base64(self, html_content: str) -> str:
+        """Replace local image src paths with base64 data URIs."""
+        import re, base64, mimetypes
+
+        def replace_src(match):
+            src = match.group(1)
+            # Skip already-embedded data URIs and remote URLs
+            if src.startswith('data:') or src.startswith('http'):
+                return match.group(0)
+            # Try path relative to output_dir first, then cwd
+            for base in (self.output_dir, Path('.')):
+                img_path = base / src
+                if img_path.exists():
+                    mime, _ = mimetypes.guess_type(str(img_path))
+                    mime = mime or 'image/png'
+                    data = base64.b64encode(img_path.read_bytes()).decode('ascii')
+                    return f'src="data:{mime};base64,{data}"'
+            # If not found, leave as-is
+            return match.group(0)
+
+        return re.sub(r'src="([^"]+)"', replace_src, html_content)
 
     def run(self) -> dict:
         print("" + "="*60)
@@ -1091,7 +1098,6 @@ class CombinedReportSystem:
         learner.generate_summary_statistics()
         learner.create_charts()
 
-        # Copy learner charts to unified dir
         for src in learner.charts_dir.glob("*.png"):
             shutil.copy2(src, self.charts_dir / src.name)
 
@@ -1106,25 +1112,86 @@ class CombinedReportSystem:
         dropout.generate_summary_statistics()
         dropout.create_charts()
 
-        # Copy dropout charts to unified dir
         for src in dropout.charts_dir.glob("*.png"):
             shutil.copy2(src, self.charts_dir / src.name)
 
-        # Merge stats 
+        # Merge stats
         self.combined_stats = {}
         self.combined_stats.update(learner.summary_stats)
         self.combined_stats.update(dropout.summary_stats)
         self.combined_stats['report_generated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        # Generate combined HTML
-        html_path = self._generate_html_report()
+        # Rotate logo and copy to output dir
+        logo_src = Path("LeadHR Logo.png")
+        logo_dest = self.output_dir / "LeadHR Logo.png"
+        if logo_src.exists():
+            try:
+                from PIL import Image as PilImage
+                img = PilImage.open(logo_src)
+                img = img.rotate(90, expand=True)
+                img.save(logo_dest)
+            except ImportError:
+                shutil.copy2(logo_src, logo_dest)
+        elif logo_dest != logo_src and logo_src.exists():
+            shutil.copy2(logo_src, logo_dest)
 
-        # Generate combined PDF
+        # Copy story images to output dir so they resolve correctly
+        story_images = [
+            "Youth Empowerment Conference 1.png",
+            "Youth Empowerment Conference 2.png",
+            "Youth Empowerment Conference 3.png",
+            "Youth Empowerment Conference 4.png",
+            "Zanele 1.png",
+            "Zanele 2.png",
+        ]
+        for img_name in story_images:
+            src = Path(img_name)
+            if src.exists():
+                shutil.copy2(src, self.output_dir / img_name)
+
+        # Generate HTML (normal version for browser viewing)
+        html_path, embedded_path = self._generate_html_report()
+
+        # Generate PDF using Brave/Chrome headless
         pdf_path = self.output_dir / "combined_report.pdf"
-        pdf_ok = build_pdf(pdf_path,
-                           "NSF Analytics Report",
-                           self.combined_stats,
-                           self.charts_dir)
+        pdf_ok = False
+        try:
+            import subprocess
+
+            browser_paths = [
+                r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe",
+                r"C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe",
+                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+                r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+            ]
+
+            browser_exe = next((p for p in browser_paths if Path(p).exists()), None)
+
+            if browser_exe:
+                print(f"  Generating PDF with: {Path(browser_exe).name}")
+                subprocess.run([
+                    browser_exe,
+                    "--headless=new",
+                    "--disable-gpu",
+                    "--no-sandbox",
+                    "--run-all-compositor-stages-before-draw",
+                    "--disable-extensions",
+                    f"--print-to-pdf={pdf_path}",
+                    "--print-to-pdf-no-header",
+                    "--no-pdf-header-footer",
+                    str(embedded_path)
+                ], check=True, capture_output=True, timeout=60)
+                print(f"  PDF saved: {pdf_path}")
+                pdf_ok = True
+            else:
+                print("  ⚠  No supported browser found for PDF generation")
+
+        except Exception as e:
+            print(f"  ⚠  PDF generation failed: {e}")
+
+        # Clean up the temporary embedded HTML
+        embedded_path.unlink(missing_ok=True)
 
         # Clean up temp dirs
         shutil.rmtree(learner_temp, ignore_errors=True)
@@ -1135,7 +1202,7 @@ class CombinedReportSystem:
         print(f"     PDF:  {pdf_path if pdf_ok else 'PDF generation skipped'}")
         return {"html": html_path, "pdf": pdf_path if pdf_ok else None}
 
-    def _generate_html_report(self) -> Path:
+    def _generate_html_report(self):
         html_template = """
 <!DOCTYPE html>
 <html lang="en">
@@ -1147,35 +1214,48 @@ class CombinedReportSystem:
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f7fa; color:#333; line-height:1.6; }
   .container { max-width:1200px; margin:0 auto; padding:20px; }
-  header { background:linear-gradient(135deg,#5B9BD5 0%,#2E75B6 100%); color:white; padding:40px 20px;
+  header { background:linear-gradient(135deg,#67c7f1 0%,#4bbaea 100%); color:white; padding:40px 20px;
            text-align:center; border-radius:10px; margin-bottom:30px; }
   header h1 { font-size:2.4em; margin-bottom:8px; }
   header p  { font-size:1.1em; opacity:.9; }
   .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-bottom:30px; }
   .stat-card { background:white; padding:22px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,.1);
-               border-left:4px solid #5B9BD5; }
-  .stat-card h3 { color:#2E75B6; font-size:.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+               border-left:4px solid #67c7f1; }
+  .stat-card h3 { color:#67c7f1; font-size:.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
   .stat-card .value { font-size:1.9em; font-weight:bold; }
   .section { background:white; padding:28px; border-radius:10px; margin-bottom:28px;
              box-shadow:0 2px 4px rgba(0,0,0,.1); }
-  .section h2 { color:#2E75B6; font-size:1.4em; margin-bottom:18px; padding-bottom:8px;
+  .section h2 { color:#67c7f1; font-size:1.4em; margin-bottom:18px; padding-bottom:8px;
                 border-bottom:2px solid #f0f0f0; }
   table { width:100%; border-collapse:collapse; margin-top:14px; }
   th,td { padding:10px 12px; text-align:left; border-bottom:1px solid #eee; }
-  th { background:#f8f9fa; font-weight:600; color:#2E75B6; }
+  th { background:#f8f9fa; font-weight:600; color:#4bbaea; }
   tr:hover { background:#f8f9fa; }
   .chart-container { text-align:center; margin:18px 0; }
   .chart-container img { max-width:100%; height:auto; border-radius:8px;
                           box-shadow:0 2px 8px rgba(0,0,0,.1); }
   .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   @media (max-width:768px) { .two-col { grid-template-columns:1fr; } }
+  .story-block { display:grid; grid-template-columns:2fr 1fr; gap:30px; align-items:stretch; }
+  @media (max-width:768px) { .story-block { grid-template-columns:1fr; } }
+  .story-text h3 { color:#67c7f1; font-size:1.15em; margin-bottom:12px; }
+  .story-text p { margin-bottom:12px; text-align:justify; }
+  .story-text ul { margin-left:20px; margin-bottom:12px; }
+  .story-text li { margin-bottom:6px; }
+  .story-images { display:flex; flex-direction:column; height:100%; }
+  .img-stack { display:flex; flex-direction:column; gap:8px; width:100%; height:100%; }
+  .img-stack img { width:100%; flex:1 1 0; min-height:0; object-fit:cover; border-radius:8px; }
   footer { text-align:center; padding:20px; color:#999; font-size:.85em; }
   .none-msg { color:#888; font-style:italic; padding:20px; }
 </style>
 </head>
 <body>
 <div class="container">
-  <header>
+  <header style="position:relative; padding:40px 20px; text-align:center;">
+    <div style="position:absolute; left:0; top:0; bottom:0; background:#ffe100; display:flex; align-items:center; justify-content:center; padding:0 20px; border-radius:10px 0 0 10px;">
+      <img src="LeadHR Logo.png" alt="Lead HR Logo"
+        style="height:110px; width:auto; display:block; object-fit:contain;">
+    </div>
     <h1>NSF Analytics Report</h1>
     <p>Combined Learner Data and Dropouts Analysis</p>
     <p style="margin-top:8px;font-size:.88em;">Generated: {{ stats.report_generated }}</p>
@@ -1185,15 +1265,54 @@ class CombinedReportSystem:
   <div class="stats-grid">
     <div class="stat-card"><h3>Total Learners</h3><div class="value">{{ stats.total_learners }}</div></div>
     <div class="stat-card"><h3>Total Dropouts</h3><div class="value">{{ stats.total_dropouts }}</div></div>
-    {% if stats.with_departure_info is defined %}
-    <div class="stat-card"><h3>With Departure Info</h3><div class="value">{{ stats.with_departure_info }}</div></div>
-    {% endif %}
     {% if stats.recent_dropouts_12mo is defined %}
     <div class="stat-card"><h3>Dropouts (Last 12 Mo)</h3><div class="value">{{ stats.recent_dropouts_12mo }}</div></div>
     {% endif %}
     {% if stats.age_stats %}<div class="stat-card"><h3>Avg Age at Start</h3><div class="value">{{ stats.age_stats.mean }} yrs</div></div>{% endif %}
     {% if stats.duration_stats %}<div class="stat-card"><h3>Avg Programme Duration</h3><div class="value">{{ stats.duration_stats.mean }} mo</div></div>{% endif %}
     {% if stats.high_demand_2024 is defined %}<div class="stat-card"><h3>High Demand 2024</h3><div class="value">{{ stats.high_demand_2024 }}</div></div>{% endif %}
+  </div>
+
+  <!-- Success Stories -->
+  <div class="section">
+    <h2>Success Stories</h2>
+
+    <div class="story-block">
+      <div class="story-text">
+        <h3>Youth Empowerment Conference</h3>
+        <p>The Wentworth Youth Centre buzzed with energy as it hosted the impactful Youth Empowerment Conference. This vital initiative was born from the passionate vision of Nonelwa, one of our dedicated interns, whose desire to effect positive change in Ward 66 truly inspired us. Working hand-in-hand with Councillor Zoe and a committed team of individuals, Nonelwa's dream transformed into a tangible reality, ensuring the conference was a resounding success. Over two dynamic days, the conference provided a crucial platform for the unemployed youth of Ward 66. Various organizations stepped forward, offering invaluable guidance on a multitude of pathways to self-improvement and opportunity.</p>
+        <p>Attendees gained insights into:</p>
+        <ul>
+          <li><b>Acquiring Employment:</b> Practical advice and strategies for job searching.</li>
+          <li><b>Internships &amp; Learnerships:</b> Information on gaining vital work experience.</li>
+          <li><b>Education &amp; Skills Development:</b> Opportunities for further learning and acquiring new, in-demand skills.</li>
+        </ul>
+        <p>The overwhelming participation and positive feedback from the youth underscored the critical need for such initiatives. It was a powerful demonstration of community collaboration, igniting hope and providing concrete steps for a brighter future for the young people of Ward 66. We're incredibly proud of Nonelwa's leadership and the collective effort that made this event possible!</p>
+      </div>
+      <div class="story-images">
+        <div class="img-stack">
+          <img src="Youth Empowerment Conference 1.png" alt="Youth Empowerment Conference 1">
+          <img src="Youth Empowerment Conference 2.png" alt="Youth Empowerment Conference 2">
+          <img src="Youth Empowerment Conference 3.png" alt="Youth Empowerment Conference 3">
+          <img src="Youth Empowerment Conference 4.png" alt="Youth Empowerment Conference 4">
+        </div>
+      </div>
+    </div>
+
+    <div class="story-block" style="margin-top:40px;">
+      <div class="story-text">
+        <h3>Spotlight on Zanele Mhlongo</h3>
+        <p>We're incredibly proud to shine a spotlight on Zanele Mhlongo, an outstanding intern from our NSF WIL placement programme. Zanele has consistently developed and added immense value to those around her. Her insightful articles, which have graced the pages of various newspapers, stand as a true testament to her exceptional skill and dedication. She has fully integrated into her environment, pushing the boundaries of what it means to be an 'intern'.</p>
+        <p style="font-style:italic; border-left:3px solid #67c7f1; padding-left:15px; margin:15px 0; color:#555;">"I feel like I'm not expressing my gratitude fully. I would like to take this opportunity to thank you for the chance you have given me. I'm absolutely loving the experience I'm gaining here. One of the highlights is seeing my work featured in prominent publications like Metro Ezasegagasini, Newsflashes and Workplace magazine. These contributions are a testament to the skills I'm developing and the value I'm adding. KEEP UP THE GOOD WORK"</p>
+        <p><b>Zanele.</b></p>
+      </div>
+      <div class="story-images">
+        <div class="img-stack">
+          <img src="Zanele 1.png" alt="Zanele 1">
+          <img src="Zanele 2.png" alt="Zanele 2">
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Host Employers -->
@@ -1288,7 +1407,7 @@ class CombinedReportSystem:
     <div class="chart-container"><img src="charts/disability_types.png" alt="Disabilities"></div>
     <table>
       <tr><th>Disability Type</th><th>Affected Learners</th></tr>
-      {% for d,c in stats.disability.items() %}{% if c > 0 %}<tr><td>{{ d.replace('_',' ').title() }}</td><td>{{ c }}</span></td></tr>{% endif %}{% endfor %}
+      {% for d,c in stats.disability.items() %}{% if c > 0 %}<tr><td>{{ d.replace('_',' ').title() }}</td><td>{{ c }}</td></tr>{% endif %}{% endfor %}
     </table>
     {% else %}<p class="none-msg">No disability data recorded.</p>{% endif %}
   </div>{% endif %}
@@ -1408,17 +1527,26 @@ class CombinedReportSystem:
     </div>
   </div>{% endif %}
 
-  <footer>NSF Analytics System | Generated on {{ stats.report_generated }}</footer>
+  <footer>Lead HR Consulting | NSF Analytics | Generated on {{ stats.report_generated }}</footer>
 </div>
 </body>
 </html>
 """
         template = Template(html_template)
         html_content = template.render(stats=self.combined_stats)
+
+        # Write the normal HTML (relative paths, for browser viewing)
         report_path = self.output_dir / "combined_report.html"
         report_path.write_text(html_content, encoding='utf-8')
         print(f"  Combined HTML saved: {report_path}")
-        return report_path
+
+        # Write a fully-embedded version for headless PDF generation
+        embedded_path = self.output_dir / "combined_report_print.html"
+        embedded_html = self._embed_images_as_base64(html_content)
+        embedded_path.write_text(embedded_html, encoding='utf-8')
+
+        return report_path, embedded_path
+
 
 # GUI
 
@@ -1429,8 +1557,8 @@ import os
 # Colours / fonts
 BG        = "#1e1e2e"
 PANEL     = "#2a2a3e"
-ACCENT    = "#5B9BD5"
-ACCENT2   = "#2E75B6"
+ACCENT    = "#67c7f1"
+ACCENT2   = "#5bbcec"
 SUCCESS   = "#2ecc71"
 ERROR     = "#e74c3c"
 WARNING   = "#f39c12"
@@ -1458,16 +1586,14 @@ class DropZone:
         self.allowed_ext       = allowed_ext
         self._on_change        = []
 
-        outer = parent  # parent is already the dnd root or a frame
+        outer = parent
 
         self.frame = tk.Frame(outer, bg=PANEL, bd=0, highlightthickness=2, # type: ignore
                               highlightbackground=ACCENT, highlightcolor=ACCENT)
 
-        # Header label
         tk.Label(self.frame, text=label, font=FONT_H, bg=PANEL, fg=ACCENT # type: ignore
                  ).pack(pady=(14, 0))
 
-        # Drop area
         self.drop_area = tk.Frame(self.frame, bg=DROP_IDLE, cursor="hand2") # type: ignore
         self.drop_area.pack(fill="both", expand=True, padx=16, pady=10)
 
@@ -1486,20 +1612,16 @@ class DropZone:
                                  justify="center")
         self.file_lbl.pack(pady=(0, 14))
 
-        # Clear button (hidden until a file is loaded)
         self.clear_btn = tk.Button(self.frame, text="✕  Clear", font=FONT_SM, # type: ignore
                                    bg=PANEL, fg=ERROR, bd=0, activebackground=PANEL,
                                    activeforeground=ERROR, cursor="hand2",
                                    command=self.clear)
-        # (packed later when a file is set)
 
-        # Bind click-to-browse on all child widgets
         for w in (self.drop_area, self.icon_lbl, self.status_lbl, self.file_lbl):
             w.bind("<Button-1>", self._browse)
             w.bind("<Enter>",    self._hover_in)
             w.bind("<Leave>",    self._hover_out)
 
-        # Register as a drop target (tkinterdnd2)
         self.drop_area.drop_target_register(DND_FILES) # type: ignore
         self.drop_area.dnd_bind("<<Drop>>",       self._on_drop)
         self.drop_area.dnd_bind("<<DragEnter>>",  self._drag_enter)
@@ -1585,7 +1707,6 @@ class ReportApp:
     def _build_ui(self):
         root = self.root
 
-        # Title bar
         hdr = tk.Frame(root, bg=ACCENT2, pady=16) # type: ignore
         hdr.pack(fill="x")
         tk.Label(hdr, text="Lead HR NSF Analytics Reporting System", # type: ignore
@@ -1593,7 +1714,6 @@ class ReportApp:
         tk.Label(hdr, text="Drop both Excel files below, choose an output folder, then Generate", # type: ignore
                  font=FONT_SM, bg=ACCENT2, fg="#cce0f5").pack(pady=(2, 0))
 
-        # Drop zones 
         zones_frame = tk.Frame(root, bg=BG) # type: ignore
         zones_frame.pack(fill="both", expand=True, padx=24, pady=20)
 
@@ -1610,7 +1730,6 @@ class ReportApp:
         for zone in (self.learner_zone, self.dropouts_zone):
             zone.on_change(self._refresh_button)
 
-        # Output folder row 
         out_frame = tk.Frame(root, bg=BG) # type: ignore
         out_frame.pack(fill="x", padx=24, pady=(0, 16))
 
@@ -1628,7 +1747,6 @@ class ReportApp:
                   relief="flat", padx=10, cursor="hand2",
                   command=self._browse_output).pack(side="left")
 
-        # Generate button 
         self.gen_btn = tk.Button(root, text="⚙  Generate Reports", # type: ignore
                                  font=("Segoe UI", 12, "bold"),
                                  bg=ACCENT2, fg="white",
@@ -1638,7 +1756,6 @@ class ReportApp:
                                  command=self._start_generation)
         self.gen_btn.pack(pady=(0, 16))
 
-        # Log / status area 
         log_frame = tk.Frame(root, bg=PANEL, bd=0) # type: ignore
         log_frame.pack(fill="both", expand=True, padx=24, pady=(0, 20))
 
@@ -1650,13 +1767,11 @@ class ReportApp:
                            relief="flat", bd=8, state="disabled", wrap="word")
         self.log.pack(fill="both", expand=True, padx=8, pady=(4, 8))
 
-        # colour tags for the log
         self.log.tag_config("ok",   foreground=SUCCESS)
         self.log.tag_config("err",  foreground=ERROR)
         self.log.tag_config("warn", foreground=WARNING)
         self.log.tag_config("head", foreground=ACCENT, font=("Courier New", 9, "bold"))
 
-        # Bottom bar 
         bar = tk.Frame(root, bg=PANEL, pady=8) # type: ignore
         bar.pack(fill="x", side="bottom")
 
@@ -1664,7 +1779,6 @@ class ReportApp:
                                    font=FONT_SM, bg=PANEL, fg=SUBTEXT)
         self.status_lbl.pack()
 
-        # Open Folder button lives here but is hidden until a run completes
         self._last_output_dir = None
         self.open_folder_btn = tk.Button( # type: ignore
             bar, text="Open Output Folder",
@@ -1762,7 +1876,6 @@ class ReportApp:
         self.gen_btn.config(state="normal", text="⚙  Generate Reports", bg=ACCENT2)
         self._refresh_button()
 
-        # Show the Open Folder button in the bottom bar
         self._last_output_dir = output_dir
         self.open_folder_btn.pack(pady=(4, 0))
 
@@ -1789,7 +1902,6 @@ def main():
         print("Run:  pip install tkinterdnd2")
         sys.exit(1)
 
-    # Make DND_FILES and TkinterDnD available to DropZone (defined at module level)
     import builtins
     builtins.DND_FILES = DND_FILES
 
